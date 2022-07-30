@@ -8,8 +8,7 @@ const char* STR_NUMERIC = "numeric";
 
 bool fillTag(TlvRecord*, const char*, unsigned int);
 bool fillLengthAndData(TlvRecord*, const char*, unsigned int);
-// can be checked in runtime if necessary
-static const bool invertByteOrder = true;
+static bool invertByteOrder = false;
 
 typedef struct{
   TlvRecord* this;
@@ -67,6 +66,8 @@ TlvRecord* newTlvRecord(const char* const tag, unsigned int tagLength,
   tlvRecord->dispose = dispose;
   tlvRecord->getTvlData = getTlvData;
   tlvRecord->getTvlBytesArray = getTvlBytesArray;
+  uint16_t testVal = 0x00FF;
+  invertByteOrder = ((uint8_t*)&testVal);
   return tlvRecord;
 }
 
