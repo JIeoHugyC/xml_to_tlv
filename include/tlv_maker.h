@@ -6,6 +6,6 @@
 #define XML_TO_TLV_TLV_MAKER_H
 #include "tlv_record.h"
 
-void createTlv();
+bool createTlv(const char*);
 
 #endif //XML_TO_TLV_TLV_MAKER_H

@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 int main(int argc, char* argv[]){
-  createTlv();
+  createTlv("test.xml");
 
     return 0;
 }

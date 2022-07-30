@@ -6,10 +6,12 @@
 #include <cxml/cxml.h>
 
 
-void createTlv(){
-
+bool createTlv(const char* fileName){
+  FILE *fp;
+  char* tlvFileName = "out.tlv";
+  remove(tlvFileName);
   // create an event reader object ('true' allows the reader to close itself once all events are exhausted)
-  cxml_sax_event_reader reader = cxml_stream_file("test.xml", true);
+  cxml_sax_event_reader reader = cxml_stream_file(fileName, true);
 
   // event object for storing the current event
   cxml_sax_event_t event;
@@ -26,19 +28,38 @@ void createTlv(){
     if (event == CXML_SAX_BEGIN_ELEMENT_EVENT){
       // consume the current event by collecting the element's name
       cxml_sax_get_element_name(&reader, &name);
-      printf("Element: `%s`\n", cxml_string_as_raw(&name));
-      cxml_string_free(&name);
     }
-      // or a text event
-    else if (event == CXML_SAX_TEXT_EVENT)
-    {
-      printf("Text event\n\n\n");
+    // or a text event
+    else if (event == CXML_SAX_TEXT_EVENT)    {
       // consume the current event by collecting the text data
       cxml_sax_get_text_data(&reader, &text);
+      printf("Element: `%s`\n", cxml_string_as_raw(&name));
       printf("Text: `%s`\n", cxml_string_as_raw(&text));
-      printf("string length: %i\n", text._len);
-      printf("string cap: %i\n", text._cap);
+      if (name._raw_chars != 0 && text._raw_chars != 0) {
+        TlvRecord *tlvRecord = newTlvRecord(name._raw_chars,
+                                            name._len,
+                                            text._raw_chars,
+                                            text._len);
+        if (tlvRecord != 0) {
+          printf("Tlv record created!\n");
+          TlvEntry entry = tlvRecord->getTvlBytesArray(tlvRecord);
+          tlvRecord->dispose(tlvRecord);
+          printf("length = %i\n", entry.length);
+          for (int i = 0; i < entry.length; ++i) {
+            printf("%u ", entry.data[i]);
+          }
+          if ((fp = fopen(tlvFileName, "a")) == NULL) {
+            printf("Couldn't open file %s", fileName);
+            return false;
+          }
+          fwrite(entry.data, 1, entry.length, fp);
+          free(entry.data);
+          fclose(fp);
+        }
+      }
       cxml_string_free(&text);
+      cxml_string_free(&name);
     }
   }
+  return true;
 }
