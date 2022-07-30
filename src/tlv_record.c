@@ -8,17 +8,34 @@ const char* STR_NUMERIC = "numeric";
 
 bool fillTag(TlvRecord*, const char*, unsigned int);
 bool fillLengthAndData(TlvRecord*, const char*, unsigned int);
+// can be checked in runtime if necessary
+static const bool invertByteOrder = true;
 
 typedef struct{
   TlvRecord* this;
   TlvData* tlvData;
-  uint8_t lengthSize;
-  uint8_t dataSize;
+  uint32_t lengthSize;
+  uint32_t dataSize;
 } Private;
 
 TlvData* getTlvData(TlvRecord* tlvRecord){
   Private* private = ((Private*)(tlvRecord->private));
   return private->tlvData;
+}
+
+
+TlvEntry getTvlBytesArray(struct TlvRecord* tlvRecord){
+  Private* private = ((Private*)(tlvRecord->private));
+  TlvEntry* entry = (TlvEntry*)malloc(sizeof(TlvEntry));
+  entry->length = 1 /*tag always 1 byte size*/ + private->lengthSize + private->dataSize;
+  entry->data = malloc(entry->length);
+  uint8_t * entryPtr = entry->data;
+  memcpy(entryPtr, &private->tlvData->tag, 1);
+  entryPtr++;
+  memcpy(entryPtr, private->tlvData->length, private->lengthSize);
+  entryPtr += private->lengthSize;
+  memcpy(entryPtr, private->tlvData->data, private->dataSize);
+  return *entry;
 }
 
 void dispose(TlvRecord* tlvRecord){
@@ -39,8 +56,8 @@ TlvRecord* newTlvRecord(const char* const tag, unsigned int tagLength,
   Private* private = ((Private*)(tlvRecord->private));
   private->this = tlvRecord;
   private->tlvData = (TlvData*) malloc(sizeof (TlvData));
-  private->lengthSize = -1;
-  private->dataSize = -1;
+  private->lengthSize = 0;
+  private->dataSize = 0;
   if (!fillTag(tlvRecord, tag, tagLength)){
     return 0;
   }
@@ -49,6 +66,7 @@ TlvRecord* newTlvRecord(const char* const tag, unsigned int tagLength,
   }
   tlvRecord->dispose = dispose;
   tlvRecord->getTvlData = getTlvData;
+  tlvRecord->getTvlBytesArray = getTvlBytesArray;
   return tlvRecord;
 }
 
@@ -73,7 +91,17 @@ bool fillLengthAndData(TlvRecord* tlvRecord, const char* const data, unsigned in
     private->dataSize = sizeof(long int);
     private->tlvData->data = malloc(private->dataSize);
     // fill fields
-    memcpy(private->tlvData->data, &val, private->dataSize);
+    if (invertByteOrder){
+      for (int i = 0; i < sizeof(long int); i++){
+        private->tlvData->data[sizeof(long int)-i-1] = *((uint8_t*)&val + i);
+      }
+    }
+    else{
+      for (int i = 0; i < sizeof(long int); i++){
+        private->tlvData->data[i] = *((uint8_t*)&val + i);
+      }
+    }
+
   }
   else if (private->tlvData->tag == TAG_TEXT){
     if (dataLength <= 0x7F){
@@ -91,6 +119,7 @@ bool fillLengthAndData(TlvRecord* tlvRecord, const char* const data, unsigned in
     else{
       return false;
     }
+    private->dataSize = dataLength;
     private->tlvData->length = malloc(private->lengthSize);
     private->tlvData->length[0] = (private->lengthSize > 1)? 0x80+private->lengthSize-1 : dataLength;
     if (private->lengthSize > 1){

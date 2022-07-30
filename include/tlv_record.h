@@ -23,12 +23,16 @@ typedef struct{
   uint8_t* data;
 } TlvData;
 
+typedef struct{
+  uint8_t* data;
+  uint32_t length;
+} TlvEntry;
+
 typedef struct TlvRecord{
   void* private;
   void (*dispose)(struct TlvRecord*);
   TlvData* (*getTvlData)(struct TlvRecord*); // @visible for testing
-  TlvData* (*getTvlBytesArray)(struct TlvRecord*);
-
+  TlvEntry (*getTvlBytesArray)(struct TlvRecord*);
 } TlvRecord;
 
 TlvRecord* newTlvRecord(const char* tag, unsigned int tagLength,

@@ -20,6 +20,13 @@ void test_fillLengthAndData( void ){
   TEST_ASSERT_EQUAL_INT(record->getTvlData(record)->data[0], 'a');
   TEST_ASSERT_EQUAL_INT(record->getTvlData(record)->data[1], 'b');
   TEST_ASSERT_EQUAL_INT(record->getTvlData(record)->data[2], 'c');
+  // check data
+  TEST_ASSERT_EQUAL_INT(record->getTvlBytesArray(record).length, 1 + 1 + 3);
+  TEST_ASSERT_EQUAL_INT(record->getTvlBytesArray(record).data[0], 0xE1);
+  TEST_ASSERT_EQUAL_INT(record->getTvlBytesArray(record).data[1], 3);
+  TEST_ASSERT_EQUAL_INT(record->getTvlBytesArray(record).data[2], 'a');
+  TEST_ASSERT_EQUAL_INT(record->getTvlBytesArray(record).data[3], 'b');
+  TEST_ASSERT_EQUAL_INT(record->getTvlBytesArray(record).data[4], 'c');
   record->dispose(record);
 
   record = newTlvRecord("numeric", 7, "0", 4);
@@ -30,24 +37,40 @@ void test_fillLengthAndData( void ){
   for (int i = 0; i < sizeof(long int); ++i){
     TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[i], 0);
   }
+  // check data
+  TEST_ASSERT_EQUAL_INT(record->getTvlBytesArray(record).length, 1 + 1 + sizeof(long int));
+  TEST_ASSERT_EQUAL_INT(record->getTvlBytesArray(record).data[0], 0xE2);
+  TEST_ASSERT_EQUAL_INT(record->getTvlBytesArray(record).data[1], sizeof(long int));
   record->dispose(record);
 
   record = newTlvRecord("numeric", 7, "1", 4);
-  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[0], 1);
+  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[sizeof(long int)-1], 1);
+  // check data
+  TEST_ASSERT_EQUAL_INT(record->getTvlBytesArray(record).length, 1 + 1 + sizeof(long int));
+  TEST_ASSERT_EQUAL_INT(record->getTvlBytesArray(record).data[0], 0xE2);
+  TEST_ASSERT_EQUAL_INT(record->getTvlBytesArray(record).data[1], sizeof(long int));
+  TEST_ASSERT_EQUAL_INT(record->getTvlBytesArray(record).data[2], 0);
+  TEST_ASSERT_EQUAL_INT(record->getTvlBytesArray(record).data[3], 0);
+  TEST_ASSERT_EQUAL_INT(record->getTvlBytesArray(record).data[4], 0);
+  TEST_ASSERT_EQUAL_INT(record->getTvlBytesArray(record).data[5], 0);
+  TEST_ASSERT_EQUAL_INT(record->getTvlBytesArray(record).data[6], 0);
+  TEST_ASSERT_EQUAL_INT(record->getTvlBytesArray(record).data[7], 0);
+  TEST_ASSERT_EQUAL_INT(record->getTvlBytesArray(record).data[8], 0);
+  TEST_ASSERT_EQUAL_INT(record->getTvlBytesArray(record).data[9], 1);
   record->dispose(record);
 
   record = newTlvRecord("numeric", 7, "255", 4);
-  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[0], 255);
+  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[sizeof(long int)-1], 255);
   record->dispose(record);
 
   record = newTlvRecord("numeric", 7, "256", 4);
-  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[0], 0);
-  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[1], 1);
+  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[sizeof(long int)-1], 0);
+  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[sizeof(long int)-2], 1);
   record->dispose(record);
 
   record = newTlvRecord("numeric", 7, "256", 4);
-  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[0], 0);
-  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[1], 1);
+  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[sizeof(long int)-1], 0);
+  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[sizeof(long int)-2], 1);
   record->dispose(record);
 
   record = newTlvRecord("numeric", 7, "-1", 4);
@@ -57,24 +80,24 @@ void test_fillLengthAndData( void ){
   record->dispose(record);
 
   record = newTlvRecord("numeric", 7, "-256", 4);
-  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[0], 0);
-  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[1], 0xFF);
+  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[sizeof(long int)-1], 0);
+  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[sizeof(long int)-2], 0xFF);
   record->dispose(record);
 
 
   record = newTlvRecord("numeric", 7, "205011", 4);
-  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[0], 211);
-  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[1], 32);
-  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[2], 3);
+  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[sizeof(long int)-1], 211);
+  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[sizeof(long int)-2], 32);
+  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[sizeof(long int)-3], 3);
   for (int i = 3; i < sizeof(long int); ++i){
-    TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[i], 0);
+    TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[sizeof(long int)-1-i], 0);
   }
   record->dispose(record);
 
   record = newTlvRecord("numeric", 7, "7", 4);
-  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[0], 7);
+  TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[sizeof(long int)-1], 7);
   for (int i = 1; i < sizeof(long int); ++i){
-    TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[i], 0);
+    TEST_ASSERT_EQUAL_UINT(record->getTvlData(record)->data[sizeof(long int)-1-i], 0);
   }
   record->dispose(record);
 
