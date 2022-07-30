@@ -5,6 +5,10 @@
 #ifndef XML_TO_TLV_TLV_RECORD_H
 #define XML_TO_TLV_TLV_RECORD_H
 #include <stdint.h>
+#include <stdlib.h>
+#include <limits.h>
+#include <stdbool.h>
+#include <string.h>
 
 static const uint8_t CLASS_OF_TAG = 1<<7 | 1<<6; // custom class
 static const uint8_t TYPE_OF_TAG = 1 << 5; // simple TLV
@@ -22,7 +26,9 @@ typedef struct{
 typedef struct TlvRecord{
   void* private;
   void (*dispose)(struct TlvRecord*);
-  TlvData* (*getTvlData)(struct TlvRecord*);
+  TlvData* (*getTvlData)(struct TlvRecord*); // @visible for testing
+  TlvData* (*getTvlBytesArray)(struct TlvRecord*);
+
 } TlvRecord;
 
 TlvRecord* newTlvRecord(const char* tag, unsigned int tagLength,

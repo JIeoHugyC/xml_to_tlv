@@ -1,11 +1,6 @@
 //
 // Created by Leonid Kabanov on 30.07.2022.
 //
-
-#include <stdlib.h>
-#include <limits.h>
-#include <stdbool.h>
-#include <string.h>
 #include "tlv_record.h"
 
 const char* STR_TEXT = "text";
@@ -84,20 +79,23 @@ bool fillLengthAndData(TlvRecord* tlvRecord, const char* const data, unsigned in
     if (dataLength <= 0x7F){
       private->lengthSize = 1;
     }
-    else if (dataLength < 0xFF){
+    else if (dataLength <= 0xFF){
       private->lengthSize = 2;
     }
-    else if (dataLength < 0xFFFF){
+    else if (dataLength <= 0xFFFF){
       private->lengthSize = 3;
     }
-    else if (dataLength < 0xFFFFFF){
+    else if (dataLength <= 0xFFFFFF){
       private->lengthSize = 4;
     }
     else{
       return false;
     }
     private->tlvData->length = malloc(private->lengthSize);
-    *private->tlvData->length = dataLength;
+    private->tlvData->length[0] = (private->lengthSize > 1)? 0x80+private->lengthSize-1 : dataLength;
+    if (private->lengthSize > 1){
+      memcpy(private->tlvData->length+1, &dataLength, private->lengthSize);
+    }
     private->tlvData->data = malloc(dataLength);
     memcpy(private->tlvData->data, data, dataLength);
   }
