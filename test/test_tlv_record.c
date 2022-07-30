@@ -1,5 +1,6 @@
 #include "unity.h"
 #include "tlv_record.h"
+#include "stdio.h"
 
 void setUp(void){
 
@@ -86,11 +87,17 @@ void test_fillLengthAndData( void ){
     memcpy(ptr, pattern, patternLength);
     ptr+=patternLength;
   }
-  record = newTlvRecord("text", 4, pattern, patternLength*bigStringRepeat);
+  record = newTlvRecord("text", 4, bigString, patternLength*bigStringRepeat);
   TEST_ASSERT_NOT_EQUAL_INT(record->getTvlData(record)->length, 0);
   TEST_ASSERT_EQUAL_INT(record->getTvlData(record)->length[0], 0x82);
   TEST_ASSERT_EQUAL_INT(record->getTvlData(record)->length[1], 230);
   TEST_ASSERT_EQUAL_INT(record->getTvlData(record)->length[2], 25);
+  TEST_ASSERT_EQUAL_INT(record->getTvlData(record)->data[0], 'A');
+  char* patternPtr = pattern;
+  for (int i = 0; i < bigStringRepeat; ++i){
+    TEST_ASSERT_EQUAL_INT(record->getTvlData(record)->data[i], *patternPtr);
+    (*patternPtr == 'Z')? patternPtr = pattern : ++patternPtr;
+  }
   record->dispose(record);
 
 
