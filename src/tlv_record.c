@@ -59,10 +59,10 @@ TlvRecord* newTlvRecord(const char* const tag, unsigned int tagLength,
 
 bool fillLengthAndData(TlvRecord* tlvRecord, const char* const data, unsigned int dataLength){
 
-  // I do it on the assumption that if we need to save space, we'll define
+  // Important! I do it on the assumption that if we need to save space, we'll define
   // our own numeric types. Here, I think, it's enough to think than
   // numeric arguments is not bigger than long int and on both systems
-  // (from and to) it will have the same size and byte order
+  // (from and to) it will have the same size and byte order (usually, it's not)
 
   Private* private = ((Private*)(tlvRecord->private));
   if (private->tlvData->tag == TAG_NUMERIC){
