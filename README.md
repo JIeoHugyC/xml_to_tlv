@@ -24,7 +24,7 @@ You should specify input file name by using --f attribute:
 ```sh
 ./xml_to_tlv --f input_file_name.xml
 ```
-And it will create `out.tlv` file for you. If you want specify output file name, please, add:
+And it will create `out.tlv` file for you. If you want to specify output file name, please, add:
 
 ```sh
 --o output_file_name.tlv
