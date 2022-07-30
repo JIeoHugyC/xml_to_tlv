@@ -6,9 +6,11 @@
 #include <cxml/cxml.h>
 
 
-bool createTlv(const char* fileName){
+bool createTlv(const char* fileName, char* tlvFileName){
   FILE *fp;
-  char* tlvFileName = "out.tlv";
+  if (tlvFileName == 0){
+    tlvFileName = "out.tlv";
+  }
   remove(tlvFileName);
   // create an event reader object ('true' allows the reader to close itself once all events are exhausted)
   cxml_sax_event_reader reader = cxml_stream_file(fileName, true);

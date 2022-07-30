@@ -11,11 +11,10 @@ include(FindPkgConfig)
 find_package(cxml REQUIRED)
 
 include_directories("include/")
-set(SRC_LIST src/main.c src/calc.c src/tlv_maker.c src/tlv_record.c src/tlv_record.c)
+set(SRC_LIST src/main.c src/tlv_maker.c src/tlv_record.c src/tlv_record.c)
 add_executable(${PROJECT_NAME} ${SRC_LIST} )
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CXML_INCLUDE_DIR})
 target_compile_definitions(${PROJECT_NAME} PUBLIC "CXML_USE_XPATH_MOD" "CXML_USE_QUERY_MOD" "CXML_USE_SAX_MOD")
-
 
 target_link_libraries(${PROJECT_NAME} ${CXML_LIBRARY})
