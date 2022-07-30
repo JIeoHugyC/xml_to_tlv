@@ -18,10 +18,8 @@ int main(int argc, char* argv[]){
   char* out = 0;
   for (int i = 1; i < argc; ++i){
     if (strcmp(argv[i], "--f") == 0){
-      printf("-f found!\n");
       if (i+1 <= argc-1 && argv[i+1] != 0){
         xml = argv[i+1];
-        printf("%s\n", xml);
       }
     }
     if (strcmp(argv[i], "--o") == 0){

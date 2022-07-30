@@ -35,21 +35,14 @@ bool createTlv(const char* fileName, char* tlvFileName){
     else if (event == CXML_SAX_TEXT_EVENT)    {
       // consume the current event by collecting the text data
       cxml_sax_get_text_data(&reader, &text);
-      printf("Element: `%s`\n", cxml_string_as_raw(&name));
-      printf("Text: `%s`\n", cxml_string_as_raw(&text));
       if (name._raw_chars != 0 && text._raw_chars != 0) {
         TlvRecord *tlvRecord = newTlvRecord(name._raw_chars,
                                             name._len,
                                             text._raw_chars,
                                             text._len);
         if (tlvRecord != 0) {
-          printf("Tlv record created!\n");
           TlvEntry entry = tlvRecord->getTvlBytesArray(tlvRecord);
           tlvRecord->dispose(tlvRecord);
-          printf("length = %i\n", entry.length);
-          for (int i = 0; i < entry.length; ++i) {
-            printf("%u ", entry.data[i]);
-          }
           if ((fp = fopen(tlvFileName, "a")) == NULL) {
             printf("Couldn't open file %s", fileName);
             return false;
