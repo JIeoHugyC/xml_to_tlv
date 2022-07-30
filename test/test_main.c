@@ -1,10 +1,8 @@
 #include "unity.h"
 #include "calc.h"
-void setUp(void)
-{
+void setUp(void){
 }
-void tearDown(void)
-{
+void tearDown(void){
 }
 void test_add( void )
 {
